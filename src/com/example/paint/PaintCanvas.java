@@ -1,25 +1,32 @@
 package com.example.paint;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 
 public class PaintCanvas extends View {
 	
 	private Paint canvasPaint, drawPaint;
-	private int paintColor = Color.BLACK, canvasColor = Color.RED;
+	private int paintColor = Color.CYAN;
 	private Canvas canvas;
 	private Bitmap canvasBitmap;
 	private Path drawPath;
 	private int currentWidth;
 	private int currentHeight;
+	//List<Path> drawnPaths;
  
 	public PaintCanvas(Context context) {
 		this(context, null, 0);
@@ -42,17 +49,20 @@ public class PaintCanvas extends View {
 		drawPaint.setStrokeJoin(Paint.Join.ROUND); // sets curves around bends to round
 		drawPaint.setStrokeCap(Paint.Cap.ROUND); // rounds off end of stroke
 		
+		//drawnPaths = new ArrayList<Path>();
+		
+		/*
 		canvasPaint = new Paint();
 		canvasPaint.setColor(canvasColor);
 		canvasPaint.setStyle(Paint.Style.FILL);		
-		
+		*/
 	}
 	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		
-		canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888); // initialize bitmap to empty
+		canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888); // initialize bitmap to empty - http://developer.android.com/guide/topics/graphics/2d-graphics.html
 		canvas = new Canvas(canvasBitmap); //sets the canvas to a bitmap. Use later to pull in images and draw on
 		
 		// use to center stuff later
@@ -63,19 +73,22 @@ public class PaintCanvas extends View {
 	// Keep as short as possible. Get in, get out
 	@Override
 	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+		super.onDraw(canvas); 
+		canvas.drawBitmap(canvasBitmap, currentWidth - canvasBitmap.getWidth(), currentHeight - canvasBitmap.getHeight(), canvasPaint);
 		canvas.drawPath(drawPath, drawPaint);
 	}
 	
+	/*
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		float xTouch = event.getX();
 		float yTouch = event.getY();
 		
+		Log.i("X & Y", xTouch + " & " + yTouch);
+		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			drawPath.moveTo(xTouch, yTouch); // on press down, draw starting point
+			drawPath.moveTo(xTouch, yTouch); // on press down, go to starting point
 			break;
 		case MotionEvent.ACTION_MOVE:
 			drawPath.lineTo(xTouch, yTouch); // on movement, draw line to where user moves to
@@ -90,6 +103,25 @@ public class PaintCanvas extends View {
 		
 		invalidate(); // update canvas
 		return true;
+	}
+	
+	*/
+	
+	public Path getDrawPath() {
+		return drawPath;
+	}
+	
+	public Canvas getCanvas() {
+		return canvas;
+	}
+	
+	public Paint getDrawPaint() {
+		return drawPaint;
+	}
+	
+	public void startNewPainting() {
+		canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
+		invalidate();
 	}
 
 }
