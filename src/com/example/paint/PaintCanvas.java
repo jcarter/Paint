@@ -1,6 +1,4 @@
 package com.example.paint;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,8 +11,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 
 public class PaintCanvas extends View {
@@ -49,6 +45,7 @@ public class PaintCanvas extends View {
 		drawPaint.setStrokeJoin(Paint.Join.ROUND); // sets curves around bends to round
 		drawPaint.setStrokeCap(Paint.Cap.ROUND); // rounds off end of stroke
 		
+		
 		//drawnPaths = new ArrayList<Path>();
 		
 		/*
@@ -78,7 +75,18 @@ public class PaintCanvas extends View {
 		canvas.drawPath(drawPath, drawPaint);
 	}
 	
-	/*
+	/* GETTERS */
+	public Path getDrawPath() {return drawPath;}
+	public Canvas getCanvas() {return canvas;}
+	public Paint getDrawPaint() {return drawPaint;}
+	
+	// Clears the whole canvas
+	public void startNewPainting() {
+		canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
+		invalidate();
+	}
+	
+	// Handles the painting
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		float xTouch = event.getX();
@@ -103,25 +111,6 @@ public class PaintCanvas extends View {
 		
 		invalidate(); // update canvas
 		return true;
-	}
-	
-	*/
-	
-	public Path getDrawPath() {
-		return drawPath;
-	}
-	
-	public Canvas getCanvas() {
-		return canvas;
-	}
-	
-	public Paint getDrawPaint() {
-		return drawPaint;
-	}
-	
-	public void startNewPainting() {
-		canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
-		invalidate();
 	}
 
 }

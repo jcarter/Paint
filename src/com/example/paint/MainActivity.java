@@ -1,5 +1,11 @@
 package com.example.paint;
 
+import com.larswerkman.holocolorpicker.ColorPicker;
+import com.larswerkman.holocolorpicker.OpacityBar;
+import com.larswerkman.holocolorpicker.SVBar;
+import com.larswerkman.holocolorpicker.SaturationBar;
+import com.larswerkman.holocolorpicker.ValueBar;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
@@ -12,23 +18,39 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TableRow;
 
 public class MainActivity extends Activity implements OnClickListener, OnTouchListener{
-	
+	 
 	PaintCanvas paintCanvas; 
-	ImageButton newPaintingButton; 
+	ImageButton newPaintingButton, colorSelctorButton; 
 	TableRow menuOptions;
+	
+	// color selector stuff
+	LinearLayout colorSelector;
+	ColorPicker picker;
+	SVBar svBar;
+	OpacityBar opacityBar;  
+	SaturationBar saturationBar;
+	ValueBar valueBar;  
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) { 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		setUpColorSelector();
+		
 		paintCanvas = (PaintCanvas)findViewById(R.id.paint_canvas);
-		newPaintingButton = (ImageButton)findViewById(R.id.imageButton1);
+		
+		// buttons
+		newPaintingButton = (ImageButton)findViewById(R.id.new_canvasIB);
+		colorSelctorButton = (ImageButton)findViewById(R.id.color_selectorIB);
+		
 		menuOptions = (TableRow)findViewById(R.id.menuOptionTR);
 		newPaintingButton.setOnClickListener(this);
+		colorSelctorButton.setOnClickListener(this);
 		paintCanvas.setOnTouchListener(this);
 	}
 
@@ -46,34 +68,54 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	@Override
 	public void onClick(View v) {
-		if (v.getId() == newPaintingButton.getId())
+		if (v.getId() == newPaintingButton.getId()) {
 			paintCanvas.startNewPainting();
+		}
+		else if (v.getId() == colorSelctorButton.getId()) {
+			showColorSelector();
+		}
 	}
 
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		float xTouch = event.getX();
-		float yTouch = event.getY();
-		
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			menuOptions.animate().translationY(-100).setDuration(200);
-			paintCanvas.getDrawPath().moveTo(xTouch, yTouch); // on press down, go to starting point
-			break;
-		case MotionEvent.ACTION_MOVE:
-			paintCanvas.getDrawPath().lineTo(xTouch, yTouch); // on movement, draw line to where user moves to
-			break;
-		case MotionEvent.ACTION_UP:
-			menuOptions.animate().translationY(0).setDuration(200);
-			paintCanvas.getCanvas().drawPath(paintCanvas.getDrawPath(), paintCanvas.getDrawPaint()); // writes the newly drawn stroke to the canvas
-			paintCanvas.getDrawPath().reset(); // reset path for the next stroke
-			break;
-		default:
-			return false;
-		}
-		
-		paintCanvas.invalidate();		
+	public boolean onTouch(View v, MotionEvent event) {	
+		if (colorSelector.getVisibility() != View.VISIBLE) {
+			paintCanvas.onTouchEvent(event); // handles the ability to draw
+			// Menu animation
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				menuOptions.animate().translationY(-100).setDuration(200); // slide menu up
+				break;
+			case MotionEvent.ACTION_UP:
+				menuOptions.animate().translationY(0).setDuration(200); // slide menu down
+				break;
+			default:
+				return false;
+			}
+		} 
+			
 		return true;
+	}
+	
+	public void setUpColorSelector() {
+		colorSelector = (LinearLayout)findViewById(R.id.colorSelectorLL);
+		picker = (ColorPicker) findViewById(R.id.picker);
+		svBar = (SVBar) findViewById(R.id.svbar);
+		opacityBar = (OpacityBar) findViewById(R.id.opacitybar);
+		//saturationBar = (SaturationBar) findViewById(R.id.saturationbar);
+		//valueBar = (ValueBar) findViewById(R.id.valuebar);
+			
+		picker.addSVBar(svBar);
+		picker.addOpacityBar(opacityBar);
+		//picker.addSaturationBar(saturationBar);
+		//picker.addValueBar(valueBar); 
+	}
+	
+	public void showColorSelector() {
+		if (colorSelector.getVisibility() == View.VISIBLE) {
+			colorSelector.setVisibility(View.GONE);
+		} else {
+			colorSelector.setVisibility(View.VISIBLE);
+		}	
 	}
 
 }
