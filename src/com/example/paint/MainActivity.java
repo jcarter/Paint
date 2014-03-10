@@ -26,6 +26,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	PaintCanvas paintCanvas; 
 	ImageButton newPaintingButton, colorSelctorButton; 
 	TableRow menuOptions;
+	Button okayColorSelectorButton;
 	
 	// color selector stuff
 	LinearLayout colorSelector;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	ValueBar valueBar;  
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) { 
+	protected void onCreate(Bundle savedInstanceState) {  
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
@@ -47,10 +48,12 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		// buttons
 		newPaintingButton = (ImageButton)findViewById(R.id.new_canvasIB);
 		colorSelctorButton = (ImageButton)findViewById(R.id.color_selectorIB);
+		okayColorSelectorButton = (Button)findViewById(R.id.okay_color_selector);
 		
 		menuOptions = (TableRow)findViewById(R.id.menuOptionTR);
 		newPaintingButton.setOnClickListener(this);
 		colorSelctorButton.setOnClickListener(this);
+		okayColorSelectorButton.setOnClickListener(this);
 		paintCanvas.setOnTouchListener(this);
 	}
 
@@ -68,17 +71,22 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	@Override
 	public void onClick(View v) {
-		if (v.getId() == newPaintingButton.getId()) {
+		switch (v.getId()) {
+		case R.id.new_canvasIB:
 			paintCanvas.startNewPainting();
-		}
-		else if (v.getId() == colorSelctorButton.getId()) {
+			break;
+		case R.id.color_selectorIB:
+		case R.id.okay_color_selector:
 			showColorSelector();
+			break;
+		default:
+			break;
 		}
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {	
-		if (colorSelector.getVisibility() != View.VISIBLE) {
+		if (colorSelector.getVisibility() != View.VISIBLE) { // don't draw or move menu when color selector is being used
 			paintCanvas.onTouchEvent(event); // handles the ability to draw
 			// Menu animation
 			switch (event.getAction()) {
@@ -110,12 +118,19 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		//picker.addValueBar(valueBar); 
 	}
 	
+	// Flips the state of the color selector when the button is pressed
 	public void showColorSelector() {
 		if (colorSelector.getVisibility() == View.VISIBLE) {
+			selectColor();
 			colorSelector.setVisibility(View.GONE);
 		} else {
 			colorSelector.setVisibility(View.VISIBLE);
 		}	
+	}
+	
+	public void selectColor() { 
+		picker.setOldCenterColor(picker.getColor()); // sets old color in center of picker (on left)
+		paintCanvas.setDrawPaint(picker.getColor()); // sets new color of paint
 	}
 
 }

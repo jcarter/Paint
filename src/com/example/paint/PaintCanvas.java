@@ -80,6 +80,11 @@ public class PaintCanvas extends View {
 	public Canvas getCanvas() {return canvas;}
 	public Paint getDrawPaint() {return drawPaint;}
 	
+	/* SETTERS */
+	public void setDrawPaint(int color) {
+		drawPaint.setColor(color);
+	}
+	
 	// Clears the whole canvas
 	public void startNewPainting() {
 		canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
