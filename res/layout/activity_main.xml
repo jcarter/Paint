@@ -39,6 +39,18 @@
             android:layout_height="wrap_content"
             android:src="@drawable/color_selection" />
 
+        <ImageButton
+            android:id="@+id/width_selectorIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
+
+        <ImageButton
+            android:id="@+id/saveIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/color_selection" />
+
     </TableRow>
 
     <LinearLayout
@@ -71,7 +83,7 @@
 		    android:layout_height="fill_parent"/>
 
         <Button
-            android:id="@+id/okay_color_selector"
+            android:id="@+id/okay_color_selector_button"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_marginBottom="15dp"

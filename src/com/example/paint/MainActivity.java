@@ -22,39 +22,40 @@ import android.widget.LinearLayout;
 import android.widget.TableRow;
 
 public class MainActivity extends Activity implements OnClickListener, OnTouchListener{
-	 
-	PaintCanvas paintCanvas; 
-	ImageButton newPaintingButton, colorSelctorButton; 
-	TableRow menuOptions;
-	Button okayColorSelectorButton;
+	
+	private final int NUMBER_OF_IMAGE_BUTTONS = 3; // number of image buttons used in menu
+	private PaintCanvas paintCanvas; 
+	private ImageButton[] buttons = new ImageButton[NUMBER_OF_IMAGE_BUTTONS]; 
+	private TableRow menuOptions;
+	private Button okayColorSelectorButton;
 	
 	// color selector stuff
-	LinearLayout colorSelector;
-	ColorPicker picker;
-	SVBar svBar;
-	OpacityBar opacityBar;  
-	SaturationBar saturationBar;
-	ValueBar valueBar;  
+	private LinearLayout colorSelector;
+	private ColorPicker picker;
+	private SVBar svBar;
+	private OpacityBar opacityBar;  
+	//private SaturationBar saturationBar;
+	//private ValueBar valueBar;  
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {  
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		setUpColorSelector();
+		initColorSelector(); // set up complex color selector
 		
+		// connect to items in xml
 		paintCanvas = (PaintCanvas)findViewById(R.id.paint_canvas);
-		
-		// buttons
-		newPaintingButton = (ImageButton)findViewById(R.id.new_canvasIB);
-		colorSelctorButton = (ImageButton)findViewById(R.id.color_selectorIB);
-		okayColorSelectorButton = (Button)findViewById(R.id.okay_color_selector);
-		
 		menuOptions = (TableRow)findViewById(R.id.menuOptionTR);
-		newPaintingButton.setOnClickListener(this);
-		colorSelctorButton.setOnClickListener(this);
+		okayColorSelectorButton = (Button)findViewById(R.id.okay_color_selector_button);
+		int imageButtonIds[] = {R.id.new_canvasIB, R.id.color_selectorIB, R.id.width_selectorIB}; // image button ids
+		
 		okayColorSelectorButton.setOnClickListener(this);
-		paintCanvas.setOnTouchListener(this);
+		// image button initialization
+		for (int i = 0; i < NUMBER_OF_IMAGE_BUTTONS; i++) {
+			buttons[i] = (ImageButton)findViewById(imageButtonIds[i]);
+			buttons[i].setOnClickListener(this);
+		}
 	}
 
 	@Override
@@ -76,8 +77,11 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			paintCanvas.startNewPainting();
 			break;
 		case R.id.color_selectorIB:
-		case R.id.okay_color_selector:
+		case R.id.okay_color_selector_button:
 			showColorSelector();
+			break;
+		case R.id.width_selectorIB:
+			
 			break;
 		default:
 			break;
@@ -104,7 +108,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		return true;
 	}
 	
-	public void setUpColorSelector() {
+	public void initColorSelector() {
 		colorSelector = (LinearLayout)findViewById(R.id.colorSelectorLL);
 		picker = (ColorPicker) findViewById(R.id.picker);
 		svBar = (SVBar) findViewById(R.id.svbar);

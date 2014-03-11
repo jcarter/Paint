@@ -16,7 +16,7 @@ import android.view.View;
 public class PaintCanvas extends View {
 	
 	private Paint canvasPaint, drawPaint;
-	private int paintColor = Color.CYAN;
+	private int paintColor = 0xff81ff00;
 	private Canvas canvas;
 	private Bitmap canvasBitmap;
 	private Path drawPath;
