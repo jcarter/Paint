@@ -8,26 +8,37 @@ import com.larswerkman.holocolorpicker.ValueBar;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TableRow;
 
-public class MainActivity extends Activity implements OnClickListener, OnTouchListener{
+public class MainActivity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
 	
+	FrameLayout masterLayout;
 	private final int NUMBER_OF_IMAGE_BUTTONS = 3; // number of image buttons used in menu
 	private PaintCanvas paintCanvas; 
 	private ImageButton[] buttons = new ImageButton[NUMBER_OF_IMAGE_BUTTONS]; 
 	private TableRow menuOptions;
 	private Button okayColorSelectorButton;
+	private Button okayWidthSelectorButton;
+	private boolean optionIsChosen = false;
+	
+	// width selector stuff
+	private LinearLayout widthSelector;
+	private WidthSelector widthPicker;
+	private SeekBar widthBar;
 	
 	// color selector stuff
 	private LinearLayout colorSelector;
@@ -39,18 +50,27 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {  
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState); 
 		setContentView(R.layout.activity_main);
 		
+		masterLayout = (FrameLayout)findViewById(R.id.masterLayoutFL);		
 		initColorSelector(); // set up complex color selector
+		
+		widthSelector = (LinearLayout)findViewById(R.id.widthSelectorLL);
+		widthPicker = (WidthSelector)findViewById(R.id.widthSelector);
+		widthBar = (SeekBar)findViewById(R.id.widthSB);
+		widthBar.setOnSeekBarChangeListener(this);
 		
 		// connect to items in xml
 		paintCanvas = (PaintCanvas)findViewById(R.id.paint_canvas);
+		paintCanvas.setOnTouchListener(this);
 		menuOptions = (TableRow)findViewById(R.id.menuOptionTR);
 		okayColorSelectorButton = (Button)findViewById(R.id.okay_color_selector_button);
+		okayWidthSelectorButton = (Button)findViewById(R.id.okay_width_selector_button);
 		int imageButtonIds[] = {R.id.new_canvasIB, R.id.color_selectorIB, R.id.width_selectorIB}; // image button ids
 		
 		okayColorSelectorButton.setOnClickListener(this);
+		okayWidthSelectorButton.setOnClickListener(this);
 		// image button initialization
 		for (int i = 0; i < NUMBER_OF_IMAGE_BUTTONS; i++) {
 			buttons[i] = (ImageButton)findViewById(imageButtonIds[i]);
@@ -81,7 +101,8 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			showColorSelector();
 			break;
 		case R.id.width_selectorIB:
-			
+		case R.id.okay_width_selector_button:
+			showWidthSelector();
 			break;
 		default:
 			break;
@@ -90,7 +111,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {	
-		if (colorSelector.getVisibility() != View.VISIBLE) { // don't draw or move menu when color selector is being used
+		if (!optionIsChosen) { // don't draw or move menu until color & width selector is gone
 			paintCanvas.onTouchEvent(event); // handles the ability to draw
 			// Menu animation
 			switch (event.getAction()) {
@@ -104,12 +125,12 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 				return false;
 			}
 		} 
-			
 		return true;
 	}
 	
 	public void initColorSelector() {
 		colorSelector = (LinearLayout)findViewById(R.id.colorSelectorLL);
+		colorSelector.setOnTouchListener(this);
 		picker = (ColorPicker) findViewById(R.id.picker);
 		svBar = (SVBar) findViewById(R.id.svbar);
 		opacityBar = (OpacityBar) findViewById(R.id.opacitybar);
@@ -127,14 +148,43 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		if (colorSelector.getVisibility() == View.VISIBLE) {
 			selectColor();
 			colorSelector.setVisibility(View.GONE);
+			optionIsChosen = false;
 		} else {
-			colorSelector.setVisibility(View.VISIBLE);
+			if (!optionIsChosen) { // make sure another option is not currently being used
+				colorSelector.setVisibility(View.VISIBLE);
+				optionIsChosen = true;
+			}
 		}	
 	}
 	
 	public void selectColor() { 
 		picker.setOldCenterColor(picker.getColor()); // sets old color in center of picker (on left)
 		paintCanvas.setDrawPaint(picker.getColor()); // sets new color of paint
+		widthPicker.setDrawPaint(picker.getColor()); // sets color of paint for width picker
 	}
+	
+	// Flips the state of the width selector when the button is pressed
+	public void showWidthSelector() {
+		if (widthSelector.getVisibility() == View.VISIBLE) {
+			widthSelector.setVisibility(View.GONE);
+			optionIsChosen = false;
+		} else {
+			if (!optionIsChosen) { // make sure another option is not currently being used
+				widthSelector.setVisibility(View.VISIBLE);
+				optionIsChosen = true;
+			}
+		}
+	}
+
+	// Methods needed by the WidthSelector class
+	@Override
+	public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
+		paintCanvas.setDrawWidth(progress); // sets the user's brush size
+		widthPicker.reDrawLine(bar, progress, paintCanvas.getDrawPaint().getColor()); // sets the visual feedback on the brush size adjuster
+	}
+	@Override
+	public void onStartTrackingTouch(SeekBar arg0) {}
+	@Override
+	public void onStopTrackingTouch(SeekBar arg0) {}
 
 }

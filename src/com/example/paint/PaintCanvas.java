@@ -3,7 +3,6 @@ package com.example.paint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -15,14 +14,15 @@ import android.view.View;
 
 public class PaintCanvas extends View {
 	
-	private Paint canvasPaint, drawPaint;
-	private int paintColor = 0xff81ff00;
+	private Paint canvasPaint;
+	protected Paint drawPaint;
+	private int paintColor = 0xff81ff00; // lime green to match default in holopicker
+	private int strokeWidth = 30;
 	private Canvas canvas;
 	private Bitmap canvasBitmap;
 	private Path drawPath;
-	private int currentWidth;
-	private int currentHeight;
-	//List<Path> drawnPaths;
+	protected int currentWidth;
+	protected int currentHeight;
  
 	public PaintCanvas(Context context) {
 		this(context, null, 0);
@@ -39,20 +39,11 @@ public class PaintCanvas extends View {
 		drawPaint = new Paint();
 		
 		drawPaint.setColor(paintColor);
-		drawPaint.setStrokeWidth(30); // set initial brush size to 20
+		drawPaint.setStrokeWidth(strokeWidth); // set initial brush size to 20
 		drawPaint.setAntiAlias(true); // makes lines smoother
 		drawPaint.setStyle(Paint.Style.STROKE); // make strokes
 		drawPaint.setStrokeJoin(Paint.Join.ROUND); // sets curves around bends to round
 		drawPaint.setStrokeCap(Paint.Cap.ROUND); // rounds off end of stroke
-		
-		
-		//drawnPaths = new ArrayList<Path>();
-		
-		/*
-		canvasPaint = new Paint();
-		canvasPaint.setColor(canvasColor);
-		canvasPaint.setStyle(Paint.Style.FILL);		
-		*/
 	}
 	
 	@Override
@@ -81,9 +72,8 @@ public class PaintCanvas extends View {
 	public Paint getDrawPaint() {return drawPaint;}
 	
 	/* SETTERS */
-	public void setDrawPaint(int color) {
-		drawPaint.setColor(color);
-	}
+	public void setDrawPaint(int color) {drawPaint.setColor(color);}
+	public void setDrawWidth(float width) {drawPaint.setStrokeWidth(width);}
 	
 	// Clears the whole canvas
 	public void startNewPainting() {
@@ -97,7 +87,7 @@ public class PaintCanvas extends View {
 		float xTouch = event.getX();
 		float yTouch = event.getY();
 		
-		Log.i("X & Y", xTouch + " & " + yTouch);
+		//Log.i("X & Y", xTouch + " & " + yTouch);
 		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
