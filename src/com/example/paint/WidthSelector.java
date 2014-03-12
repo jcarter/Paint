@@ -24,14 +24,14 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 		super(context, attrs, defStyleAttr);
 	}
 	
-	@Override
+	@Override  
 	protected void onDraw(Canvas canvas) {
-		canvas.drawLine(0, currentHeight/2, currentWidth-1, currentHeight/2, drawPaint);
+		canvas.drawLine(50, currentHeight/2, currentWidth-51, currentHeight/2, drawPaint); // draws line so rounded corners can be seen
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// makes this view not respond to touching
+		// overrides the parent method to make this view not respond to touching
 		return true;
 	}
 	
@@ -45,8 +45,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 	
 	// used to fix the issue of having to touch the width bar before the color changed  
 	public void setDrawPaint(int color) {
-		drawPaint.setColor(color);
-		invalidate();
+		super.setDrawPaint(color); // calls the parent method to set the color
+		invalidate(); // invalidates to immediately change the color
 	}
-
 }

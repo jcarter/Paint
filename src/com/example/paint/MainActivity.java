@@ -1,3 +1,25 @@
+/*
+ * Author: Justin Carter
+ * Date: 3/12/2014
+ * Assignment #2
+ * 
+ * Features:
+ * 1. Complex color picker
+ * 		- Uses an imported library called HoloColorPicker by Lars Werkman
+ * 		- Created in the activity_main.xml
+ * 		- Used in MainActivity.java
+ * 		- Methods include initColorSelector(), showColorSelector(), selectColor()
+ * 
+ * 2. Dynamic width preview selector. Shows the current color selected and adjusts 
+ * 	  the size of the preview line's width in real time.
+ * 		- Created in activity_main.xml
+ * 		- Made in WidthSelector.java (which inherits from PaintCanvas) and used in MainActivity.java
+ * 		- Method used to change line in real time - onProgressChanged()
+ * 
+ * 3. Self hiding menu bar when drawing
+ * 		- Created in activity_main.xml
+ * 		- Hides and shows menu using onTouch
+ */
 package com.example.paint;
 
 import com.larswerkman.holocolorpicker.ColorPicker;
