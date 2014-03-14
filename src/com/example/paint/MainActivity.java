@@ -31,11 +31,14 @@ import com.larswerkman.holocolorpicker.ValueBar;
 import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.PorterDuffXfermode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -45,6 +48,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
 	
@@ -56,6 +60,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	private Button okayColorSelectorButton;
 	private Button okayWidthSelectorButton;
 	private boolean optionIsChosen = false;
+	private TextView widthDisplay;
 	
 	// width selector stuff
 	private LinearLayout widthSelector;
@@ -81,6 +86,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		widthSelector = (LinearLayout)findViewById(R.id.widthSelectorLL);
 		widthPicker = (WidthSelector)findViewById(R.id.widthSelector);
 		widthBar = (SeekBar)findViewById(R.id.widthSB);
+		widthDisplay = (TextView)findViewById(R.id.widthTV);
 		widthBar.setOnSeekBarChangeListener(this);
 		
 		// connect to items in xml
@@ -97,6 +103,11 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		for (int i = 0; i < NUMBER_OF_IMAGE_BUTTONS; i++) {
 			buttons[i] = (ImageButton)findViewById(imageButtonIds[i]);
 			buttons[i].setOnClickListener(this);
+			
+			// adds the long click listener for the width selector button
+			if (imageButtonIds[i] == R.id.width_selectorIB) {
+				setLongClickButton(buttons[i]);
+			}
 		}
 	}
 
@@ -192,6 +203,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			optionIsChosen = false;
 		} else {
 			if (!optionIsChosen) { // make sure another option is not currently being used
+				paintCanvas.setupBrushSizeDisplay(widthDisplay);
 				widthSelector.setVisibility(View.VISIBLE);
 				optionIsChosen = true;
 			}
@@ -200,13 +212,32 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 
 	// Methods needed by the WidthSelector class
 	@Override
-	public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
+	public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {	
 		paintCanvas.setDrawWidth(progress); // sets the user's brush size
 		widthPicker.reDrawLine(bar, progress, paintCanvas.getDrawPaint().getColor()); // sets the visual feedback on the brush size adjuster
+		
+		// Update size of brush/eraser display
+		paintCanvas.setupBrushSizeDisplay(widthDisplay);
 	}
 	@Override
 	public void onStartTrackingTouch(SeekBar arg0) {}
 	@Override
 	public void onStopTrackingTouch(SeekBar arg0) {}
+	
+	public void setLongClickButton(ImageButton b) {
+		final ImageButton button = b; // make final image button to allow the onLongClick to use it
+		button.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				if (v.getId() == R.id.width_selectorIB) {
+					Log.i("WIDTH_BUTTON", "Long Pressed");
+					paintCanvas.setupEraser(button);
+					paintCanvas.setupBrushSizeDisplay(widthDisplay);
+					return true;
+				}
+				return false;
+			}
+		});
+	}
 
 }

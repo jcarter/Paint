@@ -25,38 +25,48 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#aa000000"
-        android:visibility="visible" >
+        android:visibility="visible" 
+        android:gravity="center"> <!-- centers buttons in table row -->
 
         <ImageButton
             android:id="@+id/new_canvasIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerInside" 
+            android:src="@drawable/new_painting" />
 
         <ImageButton
             android:id="@+id/color_selectorIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/color_selection" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:scaleType="centerCrop" 
+            android:src="@drawable/color_picker" />
 
         <ImageButton
             android:id="@+id/width_selectorIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:longClickable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/brush" />
 
         <ImageButton
             android:id="@+id/saveIB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/color_selection" />
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/eraser" />
+
     </TableRow>
 
     <LinearLayout
         android:id="@+id/colorSelectorLL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="62dp"
+        android:layout_marginTop="100dp"
         android:background="#cc000000"
         android:orientation="vertical"
         android:paddingLeft="30dp"
@@ -100,7 +110,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical" 
         android:background="#cc000000"
-        android:layout_marginTop="62dp"
+        android:layout_marginTop="100dp"
         android:visibility="gone">
 
         <RelativeLayout
@@ -110,6 +120,15 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             android:layout_marginTop="200dp" >
+
+            <TextView
+                android:id="@+id/widthTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="50sp"
+                android:layout_centerHorizontal="true" 
+                android:text="Brush Size: 30"/>
 
             <com.example.paint.WidthSelector
                 android:id="@+id/widthSelector"
