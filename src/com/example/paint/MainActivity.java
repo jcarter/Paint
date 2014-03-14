@@ -22,6 +22,8 @@
  */
 package com.example.paint;
 
+import java.util.UUID;
+
 import com.larswerkman.holocolorpicker.ColorPicker;
 import com.larswerkman.holocolorpicker.OpacityBar;
 import com.larswerkman.holocolorpicker.SVBar;
@@ -29,6 +31,8 @@ import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -49,11 +53,12 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
 	
 	FrameLayout masterLayout;
-	private final int NUMBER_OF_IMAGE_BUTTONS = 3; // number of image buttons used in menu
+	private final int NUMBER_OF_IMAGE_BUTTONS = 4; // number of image buttons used in menu
 	private PaintCanvas paintCanvas; 
 	private ImageButton[] buttons = new ImageButton[NUMBER_OF_IMAGE_BUTTONS]; 
 	private TableRow menuOptions;
@@ -95,7 +100,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		menuOptions = (TableRow)findViewById(R.id.menuOptionTR);
 		okayColorSelectorButton = (Button)findViewById(R.id.okay_color_selector_button);
 		okayWidthSelectorButton = (Button)findViewById(R.id.okay_width_selector_button);
-		int imageButtonIds[] = {R.id.new_canvasIB, R.id.color_selectorIB, R.id.width_selectorIB}; // image button ids
+		int imageButtonIds[] = {R.id.new_canvasIB, R.id.color_selectorIB, R.id.width_selectorIB, R.id.saveIB}; // image button ids
 		
 		okayColorSelectorButton.setOnClickListener(this);
 		okayWidthSelectorButton.setOnClickListener(this);
@@ -136,6 +141,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		case R.id.width_selectorIB:
 		case R.id.okay_width_selector_button:
 			showWidthSelector();
+			break;
+		case R.id.saveIB:
+			paintCanvas.saveImage();
+				
 			break;
 		default:
 			break;
@@ -194,6 +203,15 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		picker.setOldCenterColor(picker.getColor()); // sets old color in center of picker (on left)
 		paintCanvas.setDrawPaint(picker.getColor()); // sets new color of paint
 		widthPicker.setDrawPaint(picker.getColor()); // sets color of paint for width picker
+		paintCanvas.setPreviousColor(picker.getColor());
+		
+		// If eraser is enabled, allow the user to pick a color but make sure it stills paints white
+		if (paintCanvas.eraserEnabled) {
+			paintCanvas.setDrawPaint(Color.WHITE);
+			Toast reminder = Toast.makeText(getApplicationContext(), 
+					"Don't forget that you're still in eraser mode!", Toast.LENGTH_LONG);	
+			reminder.show();
+		}
 	}
 	
 	// Flips the state of the width selector when the button is pressed
@@ -203,7 +221,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			optionIsChosen = false;
 		} else {
 			if (!optionIsChosen) { // make sure another option is not currently being used
-				paintCanvas.setupBrushSizeDisplay(widthDisplay);
+				paintCanvas.updateWidthSizeDisplay(widthDisplay);
 				widthSelector.setVisibility(View.VISIBLE);
 				optionIsChosen = true;
 			}
@@ -217,7 +235,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		widthPicker.reDrawLine(bar, progress, paintCanvas.getDrawPaint().getColor()); // sets the visual feedback on the brush size adjuster
 		
 		// Update size of brush/eraser display
-		paintCanvas.setupBrushSizeDisplay(widthDisplay);
+		paintCanvas.updateWidthSizeDisplay(widthDisplay);
 	}
 	@Override
 	public void onStartTrackingTouch(SeekBar arg0) {}
@@ -232,7 +250,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 				if (v.getId() == R.id.width_selectorIB) {
 					Log.i("WIDTH_BUTTON", "Long Pressed");
 					paintCanvas.setupEraser(button);
-					paintCanvas.setupBrushSizeDisplay(widthDisplay);
+					paintCanvas.updateWidthSizeDisplay(widthDisplay);
 					return true;
 				}
 				return false;

@@ -1,14 +1,23 @@
 package com.example.paint;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.PorterDuff.Mode;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.BoringLayout.Metrics;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -22,7 +31,8 @@ public class PaintCanvas extends View {
 	private Paint canvasPaint;
 	protected Paint drawPaint;
 	private int defaultPaintColor = 0xff81ff00; // lime green to match default in holopicker
-	private int strokeWidth = 30;
+	private int previousColor;
+	private int strokeWidth = 20;
 	private Canvas canvas;
 	private Bitmap canvasBitmap;
 	private Path drawPath;
@@ -44,6 +54,8 @@ public class PaintCanvas extends View {
 		drawPath = new Path();
 		drawPaint = new Paint();
 		canvasPaint = new Paint();
+		canvasPaint.setColor(Color.WHITE);
+		canvasPaint.setStyle(Paint.Style.FILL);
 		
 		drawPaint.setColor(defaultPaintColor);
 		drawPaint.setStrokeWidth(strokeWidth); // set initial brush size to 20
@@ -61,7 +73,7 @@ public class PaintCanvas extends View {
 		canvas = new Canvas(canvasBitmap); //sets the canvas to a bitmap. Use later to pull in images and draw on
 		startNewPainting();
 		
-		// use to center stuff later
+		// use to center stuff later, if needed
 		currentWidth = w;
 		currentHeight = h;
 	}
@@ -70,7 +82,6 @@ public class PaintCanvas extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas); 
-		
 		canvas.drawBitmap(canvasBitmap, currentWidth - canvasBitmap.getWidth(), currentHeight - canvasBitmap.getHeight(), canvasPaint);
 		canvas.drawPath(drawPath, drawPaint);
 	}
@@ -85,10 +96,12 @@ public class PaintCanvas extends View {
 	public void setDrawPaint(int color) {drawPaint.setColor(color);}
 	public void setDrawWidth(float width) {drawPaint.setStrokeWidth(width);}
 	public void setEraserState(boolean eraserIsEnabled) {eraserEnabled = eraserIsEnabled;}
+	public void setPreviousColor(int color) {previousColor = color;}
 	
 	// Clears the whole canvas. Left the clear mode in case I need it later.
 	public void startNewPainting() {
-		canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
+		//canvas.drawColor(0, Mode.CLEAR); // http://stackoverflow.com/questions/6956838/how-to-erase-previous-drawing-on-canvas
+		canvas.drawColor(Color.WHITE);
 		invalidate();
 	}
 	
@@ -97,11 +110,14 @@ public class PaintCanvas extends View {
 		if (eraserEnabled) {
 			eraserEnabled = false;
 			button.setImageResource(R.drawable.brush);
-			drawPaint.setXfermode(null);
+			drawPaint.setColor(previousColor);
+			//drawPaint.setXfermode(null);
 		} else { // eraser not enabled, make it enabled
 			button.setImageResource(R.drawable.eraser);
 			//Log.i("WIDTH_BUTTON", "color: " + Color.red(canvasBitmap.getPixel(100, 100)) + Color.green(canvasBitmap.getPixel(100, 100)) + Color.blue(canvasBitmap.getPixel(100, 100)));
-			drawPaint.setXfermode(new PorterDuffXfermode(Mode.CLEAR));
+			//drawPaint.setXfermode(new PorterDuffXfermode(Mode.CLEAR));
+			previousColor = drawPaint.getColor();
+			drawPaint.setColor(Color.WHITE);
 			eraserEnabled = true;
 		}
 	}
@@ -133,11 +149,38 @@ public class PaintCanvas extends View {
 		return true;
 	}
 
-	public void setupBrushSizeDisplay(TextView widthDisplay) {
+	// Displays the real time size of the brush or eraser 
+	public void updateWidthSizeDisplay(TextView widthDisplay) {
 		if (eraserEnabled) {
 			widthDisplay.setText("Eraser Size: " + drawPaint.getStrokeWidth());
 		} else {
 			widthDisplay.setText("Brush Size: " + drawPaint.getStrokeWidth());
+		}
+	}
+
+	
+	// Saves the bitmap into the gallery
+	public void saveImage() {
+		
+		FileOutputStream imageToSave = null;
+		
+		// creates the directory to save the bitmap in
+		File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Paint");
+		if (!imageDir.mkdirs()) {
+			Log.i("IMAGE", "Failed to make directory");
+		}
+		
+		try {
+			imageToSave = new FileOutputStream(imageDir+"/test.png");
+			canvasBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageToSave);
+			imageToSave.flush();
+			imageToSave.close();
+		} catch (FileNotFoundException e) {
+			Log.i("IMAGE", "File not found");
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.i("IMAGE", "IO Exception");
+			e.printStackTrace();
 		}
 	}
 }
