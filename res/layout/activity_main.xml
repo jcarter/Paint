@@ -77,15 +77,21 @@
             android:id="@+id/picker"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginTop="30dp" />
 
-        <com.larswerkman.holocolorpicker.SVBar
-            android:id="@+id/svbar"
+        <com.larswerkman.holocolorpicker.ValueBar
+            android:id="@+id/valuebar"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginBottom="30dp" />
+            android:layout_marginBottom="10dp" />
 
+        <com.larswerkman.holocolorpicker.SaturationBar
+            android:id="@+id/saturationbar"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="10dp" />
+        
         <com.larswerkman.holocolorpicker.OpacityBar
             android:id="@+id/opacitybar"
             android:layout_width="fill_parent"

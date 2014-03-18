@@ -86,10 +86,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	// color selector stuff 
 	private LinearLayout colorSelector;
 	private ColorPicker picker;
-	private SVBar svBar; 
+	//private SVBar svBar; 
 	private OpacityBar opacityBar;  
-	//private SaturationBar saturationBar; 
-	//private ValueBar valueBar;  
+	private SaturationBar saturationBar; 
+	private ValueBar valueBar;  
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {  
@@ -185,15 +185,15 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		colorSelector = (LinearLayout)findViewById(R.id.colorSelectorLL);
 		colorSelector.setOnTouchListener(this);
 		picker = (ColorPicker) findViewById(R.id.picker);
-		svBar = (SVBar) findViewById(R.id.svbar);
+		//svBar = (SVBar) findViewById(R.id.svbar);
 		opacityBar = (OpacityBar) findViewById(R.id.opacitybar);
-		//saturationBar = (SaturationBar) findViewById(R.id.saturationbar);
-		//valueBar = (ValueBar) findViewById(R.id.valuebar);
+		saturationBar = (SaturationBar) findViewById(R.id.saturationbar);
+		valueBar = (ValueBar) findViewById(R.id.valuebar);
 			
-		picker.addSVBar(svBar);
+		//picker.addSVBar(svBar);
 		picker.addOpacityBar(opacityBar);
-		//picker.addSaturationBar(saturationBar);
-		//picker.addValueBar(valueBar); 
+		picker.addSaturationBar(saturationBar);
+		picker.addValueBar(valueBar); 
 	}
 	
 	// Flips the state of the color selector when the button is pressed
