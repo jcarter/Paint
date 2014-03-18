@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class PaintCanvas extends View {
@@ -50,7 +54,6 @@ public class PaintCanvas extends View {
 
 	public PaintCanvas(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		// http://code.tutsplus.com/tutorials/android-sdk-create-a-drawing-app-touch-interaction--mobile-19202
 		drawPath = new Path();
 		drawPaint = new Paint();
 		canvasPaint = new Paint();
@@ -91,6 +94,7 @@ public class PaintCanvas extends View {
 	public Canvas getCanvas() {return canvas;}
 	public Paint getDrawPaint() {return drawPaint;}
 	public boolean isErasing() {return eraserEnabled;}
+	public Bitmap getBitmap() {return canvasBitmap;}
 	
 	/* SETTERS */
 	public void setDrawPaint(int color) {drawPaint.setColor(color);}
@@ -160,27 +164,36 @@ public class PaintCanvas extends View {
 
 	
 	// Saves the bitmap into the gallery
-	public void saveImage() {
+	public void saveImage(ContentResolver contentResolver, Context context) {
 		
-		FileOutputStream imageToSave = null;
-		
-		// creates the directory to save the bitmap in
-		File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Paint");
+		// make camera folder in DCIM if not already created. It must be created first. Took forever to find out that
+		// Android 4.4 doesn't create it by default
+		// https://android.googlesource.com/platform/packages/providers/MediaProvider/+/92013781ab1573eee3d5d75682f320fe3a6076f2%5E!/
+		// http://stackoverflow.com/questions/20164558/android-mediastore-images-media-insertimage-works-on-kitkat-only-after-using-cam
+		File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
 		if (!imageDir.mkdirs()) {
-			Log.i("IMAGE", "Failed to make directory");
-		}
+			Log.i("IMAGE", "Failed to make directory. It might already exist.");
+		}	
 		
-		try {
-			imageToSave = new FileOutputStream(imageDir+"/test.png");
-			canvasBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageToSave);
-			imageToSave.flush();
-			imageToSave.close();
-		} catch (FileNotFoundException e) {
-			Log.i("IMAGE", "File not found");
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.i("IMAGE", "IO Exception");
-			e.printStackTrace();
+		this.setDrawingCacheEnabled(true);
+		
+		// add bitmap to gallery with random name
+		String imageToSave = MediaStore.Images.Media.insertImage(
+			    contentResolver, this.getDrawingCache(),
+			    UUID.randomUUID().toString()+".png", "Paint app drawing");
+		
+		// toasts
+		if(imageToSave!=null){
+		    Toast savedToast = Toast.makeText(context, 
+		        "Drawing saved to Gallery!", Toast.LENGTH_SHORT);
+		    savedToast.show();
 		}
+		else{
+		    Toast unsavedToast = Toast.makeText(context, 
+		        "Sorry. Image could not be saved.", Toast.LENGTH_SHORT);
+		    unsavedToast.show();
+		}
+		this.destroyDrawingCache();
+		
 	}
 }

@@ -24,19 +24,20 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 		public WidthSelector(Context context, AttributeSet attrs, int defStyleAttr) {
 			super(context, attrs, defStyleAttr);
 		}
-		
+
+		// Draws the display for the user to change the brush width
 		@Override  
 		protected void onDraw(Canvas canvas) {
 			canvas.drawLine(50, currentHeight/2, currentWidth-51, currentHeight/2, drawPaint); // draws line so rounded corners can be seen
 		}
 		
+		// Overrides the parent method to make this view not respond to touching
 		@Override
 		public boolean onTouchEvent(MotionEvent event) {
-			// overrides the parent method to make this view not respond to touching
 			return true;
 		}
 		
-		// draws the line to show user the width they're selecting
+		// Draws the line to show user the width they're selecting
 		public void reDrawLine(SeekBar bar, int progress, int color) {
 			drawPaint.setStrokeWidth(progress);
 			drawPaint.setColor(color);
@@ -44,7 +45,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 			invalidate();
 		}
 		
-		// used to fix the issue of having to touch the width bar before the color changed  
+		// Used to fix the issue of having to touch the width bar before the color changed  
 		public void setDrawPaint(int color) {
 			super.setDrawPaint(color); // calls the parent method to set the color
 			invalidate(); // invalidates to immediately change the color

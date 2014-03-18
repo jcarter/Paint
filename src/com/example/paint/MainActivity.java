@@ -19,9 +19,17 @@
  * 3. Self hiding menu bar when drawing
  * 		- Created in activity_main.xml
  * 		- Hides and shows menu using onTouch
+ * 
+ * 4. Eraser mode by long click on the brush button
+ * 		- Set up in setLongClickButton in MainActivity
+ * 
+ * 5. Save the drawing to the device's gallery
+ * 		- Created in PaintCanvas's saveImage()
+ * 		- Used in MainActivity's saveDrawingPrompt()
  */
 package com.example.paint;
 
+import java.io.File;
 import java.util.UUID;
 
 import com.larswerkman.holocolorpicker.ColorPicker;
@@ -34,6 +42,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
@@ -71,13 +82,13 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	private LinearLayout widthSelector;
 	private WidthSelector widthPicker;
 	private SeekBar widthBar;
-	
-	// color selector stuff
+	 
+	// color selector stuff 
 	private LinearLayout colorSelector;
 	private ColorPicker picker;
-	private SVBar svBar;
+	private SVBar svBar; 
 	private OpacityBar opacityBar;  
-	//private SaturationBar saturationBar;
+	//private SaturationBar saturationBar; 
 	//private ValueBar valueBar;  
 
 	@Override
@@ -132,7 +143,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.new_canvasIB:
-			paintCanvas.startNewPainting();
+			newDrawingPrompt();
 			break;
 		case R.id.color_selectorIB:
 		case R.id.okay_color_selector_button:
@@ -143,8 +154,8 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			showWidthSelector();
 			break;
 		case R.id.saveIB:
-			paintCanvas.saveImage();
-				
+			saveDrawingPrompt();
+			
 			break;
 		default:
 			break;
@@ -199,6 +210,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		}	
 	}
 	
+	// Sets the color chosen in the color picker to be used for the paintCanvas
 	public void selectColor() { 
 		picker.setOldCenterColor(picker.getColor()); // sets old color in center of picker (on left)
 		paintCanvas.setDrawPaint(picker.getColor()); // sets new color of paint
@@ -242,6 +254,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	@Override
 	public void onStopTrackingTouch(SeekBar arg0) {}
 	
+	// Used to swap between brush and eraser
 	public void setLongClickButton(ImageButton b) {
 		final ImageButton button = b; // make final image button to allow the onLongClick to use it
 		button.setOnLongClickListener(new OnLongClickListener() {
@@ -258,4 +271,41 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		});
 	}
 
+	// Prompts the user dialog to verify that they want to save the drawing
+	public void saveDrawingPrompt() {
+		AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+		saveDialog.setTitle("Save Drawing");
+		saveDialog.setMessage("Save Drawing to Device Gallery?");
+		saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+		    public void onClick(DialogInterface dialog, int which){
+		        // save drawing
+		    	paintCanvas.saveImage(getContentResolver(), getApplicationContext());
+		    }
+		});
+		saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+		    public void onClick(DialogInterface dialog, int which){
+		        dialog.cancel();
+		    }
+		});
+		saveDialog.show();
+	}
+
+	// Prompts the user dialog to verify that they want to start a new drawing
+	public void newDrawingPrompt() {
+		AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+		saveDialog.setTitle("Start New Drawing");
+		saveDialog.setMessage("Are You Sure?");
+		saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+		    public void onClick(DialogInterface dialog, int which){
+		        // new drawing
+		    	paintCanvas.startNewPainting();
+		    }
+		});
+		saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+		    public void onClick(DialogInterface dialog, int which){
+		        dialog.cancel();
+		    }
+		});
+		saveDialog.show();
+	}
 }
