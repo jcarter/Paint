@@ -143,7 +143,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.new_canvasIB:
-			newDrawingPrompt();
+			newPaintingPrompt();
 			break;
 		case R.id.color_selectorIB:
 		case R.id.okay_color_selector_button:
@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 			showWidthSelector();
 			break;
 		case R.id.saveIB:
-			saveDrawingPrompt();
+			savePaintingPrompt();
 			
 			break;
 		default:
@@ -250,9 +250,9 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 		paintCanvas.updateWidthSizeDisplay(widthDisplay);
 	}
 	@Override
-	public void onStartTrackingTouch(SeekBar arg0) {}
+	public void onStartTrackingTouch(SeekBar bar) {}
 	@Override
-	public void onStopTrackingTouch(SeekBar arg0) {}
+	public void onStopTrackingTouch(SeekBar bar) {}
 	
 	// Used to swap between brush and eraser
 	public void setLongClickButton(ImageButton b) {
@@ -272,10 +272,10 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	}
 
 	// Prompts the user dialog to verify that they want to save the drawing
-	public void saveDrawingPrompt() {
+	public void savePaintingPrompt() {
 		AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-		saveDialog.setTitle("Save Drawing");
-		saveDialog.setMessage("Save Drawing to Device Gallery?");
+		saveDialog.setTitle("Save Painting");
+		saveDialog.setMessage("Save Painting to Device Gallery?");
 		saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
 		    public void onClick(DialogInterface dialog, int which){
 		        // save drawing
@@ -291,9 +291,9 @@ public class MainActivity extends Activity implements OnClickListener, OnTouchLi
 	}
 
 	// Prompts the user dialog to verify that they want to start a new drawing
-	public void newDrawingPrompt() {
+	public void newPaintingPrompt() {
 		AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-		saveDialog.setTitle("Start New Drawing");
+		saveDialog.setTitle("Start New Painting");
 		saveDialog.setMessage("Are You Sure?");
 		saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
 		    public void onClick(DialogInterface dialog, int which){
